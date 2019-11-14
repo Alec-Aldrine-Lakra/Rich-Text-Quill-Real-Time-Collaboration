@@ -1,17 +1,7 @@
 var WebSocket = require('ws');
 var WebSocketJSONStream = require('@teamwork/websocket-json-stream');
 var shareDBServer = require('./sharedb-server');
-var connection = shareDBServer.connect();
 var uuid = require('uuid');
-var doc = connection.get('examples', 'richtext'); //examples collection with id = 'richtext'
-doc.fetch(function(err) {
-  if (err) throw err;
-  if (doc.type === null) {
-    doc.create([{insert: 'Document Ready'}], 'rich-text', callback);
-    return;
-  }
-});
-//var Online = require('../model/online');
 
 module.exports = function(server) {
   var wss = new WebSocket.Server({
@@ -21,7 +11,7 @@ module.exports = function(server) {
   wss.on('connection', function(ws, req) {
     ws.id = uuid();
     ws.isAlive = true;
-   
+    console.log(`Server connected at ${ws.id}`);
     var stream = new WebSocketJSONStream(ws);
     shareDBServer.listen(stream);
 

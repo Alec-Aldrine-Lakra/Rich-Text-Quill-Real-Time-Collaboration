@@ -3,7 +3,6 @@ var express = require('express');
 const url = require('url');
 var app = express();
 var cors = require('cors');
-app.use(require('./controller/login'));
 app.use(cors());
 var server = http.createServer(app);
 var wssShareDB = require('./helpers/wss-sharedb')(server);

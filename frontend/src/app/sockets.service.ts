@@ -9,7 +9,6 @@ export class SocketsService {
   sharedb: any;
   socket1:any;
   socket2:any;
-  doc: any;
 
   constructor() {
     this.sharedb = require('@teamwork/sharedb/lib/client');
@@ -18,6 +17,5 @@ export class SocketsService {
     this.socket1 = new ReconnectingWebSocket('ws://localhost:8080/sharedb');
     this.socket2 = new ReconnectingWebSocket('ws://localhost:8080/cursors');
     this.connection = new this.sharedb.Connection(this.socket1);
-    this.doc = this.connection.get('examples', 'richtext');
   }
 }

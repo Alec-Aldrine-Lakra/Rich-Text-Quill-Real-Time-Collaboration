@@ -7,7 +7,6 @@ import BlotFormatter from 'quill-blot-formatter';
 import 'quill-autoformat';
 import MagicUrl from 'quill-magic-url';
 import QuillCursors from 'quill-cursors';
-import ImageResize  from 'quill-image-resize';
 import QuillBetterTable from "quill-better-table";
 Quill.register('modules/blotFormatter', BlotFormatter);
 Quill.register('modules/magicUrl', MagicUrl);
@@ -32,7 +31,9 @@ export class EditorComponent implements OnInit {
   public modules: any;
   public cursor: any;
   public cursorModule: any;
+  public doc: any;
   constructor() {
+    this.doc = s.connection.get('examples','richtext7');
     this.modules = {
       blotFormatter:{},
       magicUrl: true,
@@ -47,10 +48,9 @@ export class EditorComponent implements OnInit {
       },
       cursors: {
           hideDelayMs: 5000,
-          hideSpeedMs: 1000,
+          hideSpeedMs: 3000,
           transformOnTextChange: true
       },
-      //imageResize: {},
       table: false, // disable table module
       "better-table": {
         operationMenu: {
@@ -68,9 +68,18 @@ export class EditorComponent implements OnInit {
       keyboard: {
         bindings: QuillBetterTable.keyboardBindings
       }
-    }
+    };
   }
   editorCreated($event){
+    this.doc.fetch((err)=>{
+      if (err) throw err;
+      if (this.doc.type === null) {
+        this.doc.create([{insert: 'Document Created'}], 'rich-text');
+        return;
+      }
+    });
+   
+
     let token = JSON.parse(localStorage.getItem('currentUser')).token;
     let {name,id} = jsondecoder(token).user; //name
     this.cursor = new Cursor(id,name,null);
@@ -86,10 +95,10 @@ export class EditorComponent implements OnInit {
       sessionStorage.setItem(d.id, JSON.stringify(d)); //update cursors contents
     })
 
-    s.doc.subscribe((err)=>{ // Get initial value of document and subscribe to changes
+    this.doc.subscribe((err)=>{ // Get initial value of document and subscribe to changes
       if(err) throw err;
-       $event.setContents(s.doc.data);
-        s.doc.on('op', (op, source)=>{
+       $event.setContents(this.doc.data);
+         this.doc.on('op', (op, source)=>{
         if (source === 'quill') return;
         $event.updateContents(op);
       });
@@ -101,7 +110,7 @@ export class EditorComponent implements OnInit {
   logChanged($event)
   { 
     if ($event.source !== 'user') return;
-    s.doc.submitOp($event.delta, {source: 'quill'});
+     this.doc.submitOp($event.delta, {source: 'quill'});
   }
   selectionUpdate($event)
   {
