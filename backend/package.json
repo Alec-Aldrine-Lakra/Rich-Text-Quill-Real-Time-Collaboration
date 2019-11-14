@@ -1,0 +1,40 @@
+{
+  "name": "sharedb-example-rich-text",
+  "version": "1.0.0",
+  "description": "A simple rich-text editor example based on Quill and ShareDB",
+  "main": "server.js",
+  "scripts": {
+    "build": "mkdir -p static/dist/ && ./node_modules/.bin/browserify client.js -o static/dist/bundle.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "Nate Smith",
+  "contributors": [
+    "Avital Oliver <avital@aoliver.org> (https://aoliver.org/)"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@teamwork/sharedb": "^3.1.0",
+    "@teamwork/sharedb-mongo": "^3.0.0",
+    "@teamwork/websocket-json-stream": "^2.0.0",
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.3.3",
+    "mongoose": "^5.7.10",
+    "quill": "^1.3.7",
+    "reconnecting-websocket": "^4.2.0",
+    "rich-text": "^4.0.0",
+    "sharedb": "^1.0.0-beta",
+    "sharedb-mongo": "^1.0.0-beta.9",
+    "socket.io": "^2.3.0",
+    "uuid": "^3.3.3",
+    "ws": "^7.2.0"
+  },
+  "devDependencies": {
+    "browserify": "^16.5.0"
+  }
+}
