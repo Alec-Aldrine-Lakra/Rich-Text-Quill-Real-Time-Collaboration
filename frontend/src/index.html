@@ -9,5 +9,16 @@
 </head>
 <body>
   <app-root></app-root>
+  
+  <script>
+      window.onbeforeunload = function(){
+          sessionStorage.setItem("origin", window.location.href);
+      }
+      window.onload = function(){
+          if(window.location.href == sessionStorage.getItem("origin")){
+              sessionStorage.clear();
+          }
+      }
+  </script>
 </body>
 </html>

@@ -3,7 +3,6 @@ import {ViewChild, Component, OnInit } from '@angular/core';
 import Quill from 'quill';
 import {SocketsService} from '../sockets.service';
 import BlotFormatter from 'quill-blot-formatter';
-
 import 'quill-autoformat';
 import MagicUrl from 'quill-magic-url';
 import QuillCursors from 'quill-cursors';
@@ -71,7 +70,7 @@ export class EditorComponent implements OnInit {
     };
   }
   editorCreated($event){
-    this.doc.fetch((err)=>{
+    this.doc.fetch((err)=>{ //If the document does not exist
       if (err) throw err;
       if (this.doc.type === null) {
         this.doc.create([{insert: 'Document Created'}], 'rich-text');
@@ -79,7 +78,6 @@ export class EditorComponent implements OnInit {
       }
     });
    
-
     let token = JSON.parse(localStorage.getItem('currentUser')).token;
     let {name,id} = jsondecoder(token).user; //name
     this.cursor = new Cursor(id,name,null);
@@ -103,8 +101,6 @@ export class EditorComponent implements OnInit {
         $event.updateContents(op);
       });
     });
-
-
   }
   
   logChanged($event)

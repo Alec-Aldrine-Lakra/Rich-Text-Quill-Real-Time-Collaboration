@@ -5,10 +5,9 @@ import { AppComponent } from "./app.component";
 import { EditorComponent } from './editor/editor.component';
 import { AppRoutingModule } from './app-routing.module';
 import {SocketsService} from './sockets.service';
-//import { MentionModule } from 'angular-mentions';
 @NgModule({
   declarations: [AppComponent, EditorComponent],
-  imports: [BrowserModule, AppRoutingModule,QuillModule.forRoot()],//, MentionModule],
+  imports: [BrowserModule, AppRoutingModule, QuillModule.forRoot()],//, MentionModule],
   providers: [SocketsService],
   bootstrap: [AppComponent]
 })
