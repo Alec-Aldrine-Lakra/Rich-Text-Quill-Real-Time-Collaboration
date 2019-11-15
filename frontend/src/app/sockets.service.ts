@@ -14,8 +14,8 @@ export class SocketsService {
     this.sharedb = require('@teamwork/sharedb/lib/client');
     this.sharedb.types.register(require('rich-text').type);
     // Open WebSocket connection to ShareDB server
-    this.socket1 = new ReconnectingWebSocket('ws://localhost:8080/sharedb');
-    this.socket2 = new ReconnectingWebSocket('ws://localhost:8080/cursors');
+    this.socket1 = new ReconnectingWebSocket('ws://localhost:8080/sharedb'); //new ReconnectingWebSocket('ws://192.168.1.149:8080/sharedb');
+    this.socket2 = new ReconnectingWebSocket('ws://localhost:8080/cursors'); //new ReconnectingWebSocket('ws://192.168.1.149:8080/cursors');
     this.connection = new this.sharedb.Connection(this.socket1);
   }
 }

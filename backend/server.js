@@ -5,10 +5,8 @@ var app = express();
 var cors = require('cors');
 app.use(cors());
 var server = http.createServer(app);
-var wssShareDB = require('./helpers/wss-sharedb')(server);
-var wssCursors = require('./helpers/wss-cursors')(server);
+const {wssCursors, wssShareDB} =  require('./helpers/sockets'); 
 
-// Connect any incoming WebSocket connection to ShareDB
 server.on('upgrade', (request, socket, head) => {
   const pathname = url.parse(request.url).pathname;
   if (pathname === '/sharedb') {

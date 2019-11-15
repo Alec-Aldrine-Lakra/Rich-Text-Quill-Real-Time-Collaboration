@@ -26,13 +26,13 @@ export class EditorComponent implements OnInit {
   @ViewChild(QuillEditorComponent, { static: true })
   editor: QuillEditorComponent;
   content = '';
-  items: string[] = ["Irshad", "Anmol"];
   public modules: any;
   public cursor: any;
   public cursorModule: any;
   public doc: any;
   constructor() {
     this.doc = s.connection.get('examples','richtext7');
+    localStorage.setItem('roomid','richtext7');
     this.modules = {
       blotFormatter:{},
       magicUrl: true,
@@ -46,8 +46,8 @@ export class EditorComponent implements OnInit {
         }
       },
       cursors: {
-          hideDelayMs: 5000,
-          hideSpeedMs: 3000,
+          hideDelayMs: 8000,
+          hideSpeedMs: 5000,
           transformOnTextChange: true
       },
       table: false, // disable table module
@@ -80,7 +80,7 @@ export class EditorComponent implements OnInit {
    
     let token = JSON.parse(localStorage.getItem('currentUser')).token;
     let {name,id} = jsondecoder(token).user; //name
-    this.cursor = new Cursor(id,name,null);
+    this.cursor = new Cursor(id,name);
     this.cursor.updateCursor(null);
     this.cursorModule =  this.editor.quillEditor.getModule('cursors'); 
     s.socket2.addEventListener('message',data=>{
@@ -97,8 +97,8 @@ export class EditorComponent implements OnInit {
       if(err) throw err;
        $event.setContents(this.doc.data);
          this.doc.on('op', (op, source)=>{
-        if (source === 'quill') return;
-        $event.updateContents(op);
+            if (source === 'quill') return;
+            $event.updateContents(op);
       });
     });
   }
@@ -122,19 +122,19 @@ class Cursor{
   public range: any;
   public color: string;
   public name: string;
-  constructor(id: string, name: string,range: null){
+  public roomid: string;
+  constructor(id: string, name: string){
     this.name = name;
     this.id = id;
     this.color = chance.color({format:'hex'});
     this.range=null;
+    this.roomid = localStorage.getItem('roomid');
   }
 
-  updateCursor(range){
-    this.range = range;
-    let name = this.name;
-    let id = this.id;
-    let color = this.color;
-    let data = JSON.stringify({name, id, color, range});
+  updateCursor(r){
+    this.range = r;
+    let [name, id, color, range, roomid] = [this.name, this.id, this.color, this.range, this.roomid];
+    let data = JSON.stringify({name, id, color, range, roomid});
     s.socket2.send(data);
   }
 }
