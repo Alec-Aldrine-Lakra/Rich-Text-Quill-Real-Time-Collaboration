@@ -12,6 +12,8 @@ Quill.register('modules/magicUrl', MagicUrl);
 Quill.register({'modules/better-table' : QuillBetterTable},true);
 Quill.register({'modules/cursors':QuillCursors},true); 
 
+
+
 import jsondecoder from 'jsonwebtoken/decode.js';
 var chance = require('chance').Chance();
 let s = new SocketsService();
@@ -30,6 +32,7 @@ export class EditorComponent implements OnInit {
   public cursor: any;
   public cursorModule: any;
   public doc: any;
+
   constructor() {
     this.doc = s.connection.get('examples','richtext7');
     localStorage.setItem('roomid','richtext7');
@@ -66,10 +69,61 @@ export class EditorComponent implements OnInit {
       },
       keyboard: {
         bindings: QuillBetterTable.keyboardBindings
-      }
+      },
+      toolbar:[['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+      ['blockquote', 'code-block'],
+    
+      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+      [{ 'direction': 'rtl' }],                         // text direction
+    
+      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+    
+      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+      ['clean'],
+      ['Comment']  ]
     };
   }
+
   editorCreated($event){
+      var customButton = document.querySelector('.ql-Comment');
+      customButton.addEventListener('click',()=>{
+        var range = this.editor.quillEditor.getSelection();
+        if(!range || range.length==0)
+            alert('Please select a Text');
+        else
+        {
+            var prompt = window.prompt("Please Enter Comment", "");
+            if (prompt == null || prompt == "") {
+              alert("User cancelled the prompt.");  
+            } else {
+                //range = this.editor.quillEditor.getSelection();
+                var text = this.editor.quillEditor.getText(range.index, range.length);
+                console.log("User has highlighted: ", text);
+                console.log(range.index, range.length);
+                this.editor.quillEditor.formatText(range.index, range.length, {
+                  background: "#fff72b"
+                });
+                this.editor.quillEditor.formatText(0,0, {
+                  background: "#ffffff"
+                 });
+                 localStorage.se
+                //drawComments(metaData);
+            }
+        }
+
+        
+         console.log(this.editor.quillEditor.getSelection());
+      });
+
+
+
+
     this.doc.fetch((err)=>{ //If the document does not exist
       if (err) throw err;
       if (this.doc.type === null) {
@@ -105,8 +159,8 @@ export class EditorComponent implements OnInit {
   
   logChanged($event)
   { 
-    if ($event.source !== 'user') return;
-     this.doc.submitOp($event.delta, {source: 'quill'});
+      if ($event.source !== 'user') return;  
+      this.doc.submitOp($event.delta, {source: 'quill'});
   }
   selectionUpdate($event)
   {
