@@ -5,7 +5,7 @@ var app = express();
 var cors = require('cors');
 app.use(cors());
 var server = http.createServer(app);
-const {wssCursors, wssShareDB} =  require('./helpers/sockets'); 
+const {wssCursors, wssShareDB, wssComments} =  require('./helpers/sockets'); 
 
 server.on('upgrade', (request, socket, head) => {
   const pathname = url.parse(request.url).pathname;
@@ -17,7 +17,8 @@ server.on('upgrade', (request, socket, head) => {
       wssCursors.handleUpgrade(request, socket, head, (ws) => {
         wssCursors.emit('connection', ws);
       });
-    } else {
+    } 
+     else {
       socket.destroy();
     }
 });

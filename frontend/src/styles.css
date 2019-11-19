@@ -3,22 +3,46 @@
 @import 'https://unpkg.com/quill-better-table@1.2.4/dist/quill-better-table.css';
 @import '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css';
 
-quill-editor {
-    display: block;
-    height: 500px;
-  }
-  .ql-Comment::after{
-    content: 'Comment';
+  quill-editor {
+    display: inline-block;
+    width: 80vw;
+    height: 100vh;
   }
   .ql-editor:focus {
     border: 1px solid #80bdff !important;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
   }
-  
+  .comments{
+    display: inline-block;
+    width: 20vw;
+  }
   .ng-invalid {
     border: 1px dashed red;
   }
-  
+  .padd{
+    padding: 10px;
+    background-color: azure;
+    box-shadow: black;
+    border: 1px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+  }
+  ul{
+    list-style: none;
+    padding: 0;
+  }
+  .padd:hover{
+    background-color: gray;
+    color: white;
+    font-weight: bold;
+  }
+  #resolve{
+    color: blue;
+    background-color: white;
+    padding: 2px;
+    border-radius: 3px;
+  }
   /* Set dropdown font-families */
   
   [quill-editor-toolbar] .ql-font span[data-label="Aref Ruqaa"]::before {
@@ -52,4 +76,9 @@ quill-editor {
     padding: 5px;
     border: 1px solid #b2b2b2;
     color: #363030;
+  }
+  app-editor{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
   }
