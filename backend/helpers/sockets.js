@@ -36,12 +36,23 @@ wssc.on('connection', function(ws2, req) {
         
         if(d.comment){
             let comment = new Comment({docid: d.roomid, uid: d.id, comment: d.comment, range: d.range}); //saving comments to comments collection
-            await comment.save();
+            try{        
+                let res = await comment.save();
+                d.comment_id = res._id;
+                d.datetime = res.created_on;
+            }
+            catch(e){
+                console.log(`Error ${e}`);
+            }   
+        }
+        else if(d.message==="delete"){
+            let m = await Comment.findByIdAndRemove(d.id);
+            console.log(m);
         }
     
         wssc.clients.forEach(function each(client) {
             if (client.readyState === WebSocket.OPEN && client.roomid===ws2.roomid)
-                client.send(data);
+                client.send(JSON.stringify(d));
         });
     }); 
     ws2.on('close', function(code, reason) {

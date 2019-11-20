@@ -20,28 +20,39 @@
     border: 1px dashed red;
   }
   .padd{
-    padding: 10px;
-    background-color: azure;
-    box-shadow: black;
-    border: 1px solid black;
+    padding: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
     border-radius: 5px;
     cursor: pointer;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
     margin: 5px;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-around;
   }
   ul{
     list-style: none;
     padding: 0;
   }
-  .padd:hover{
-    background-color: gray;
-    color: white;
+  li:first-child{
     font-weight: bold;
   }
-  #resolve{
+  .padd:hover{
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  }
+  .resolve{
     color: blue;
     background-color: white;
     padding: 2px;
+    border: 1px solid black;
     border-radius: 3px;
+    height: 25px;
+  }
+  .resolve:hover{
+    background-color: blue;
+    color: white;
+    border: 1px solid blue;
   }
   /* Set dropdown font-families */
   

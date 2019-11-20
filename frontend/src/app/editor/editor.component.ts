@@ -7,6 +7,7 @@ import 'quill-autoformat';
 import MagicUrl from 'quill-magic-url';
 import QuillCursors from 'quill-cursors';
 import QuillBetterTable from "quill-better-table";
+import moment from 'moment-timezone'
 Quill.register('modules/blotFormatter', BlotFormatter);
 Quill.register('modules/magicUrl', MagicUrl);
 Quill.register({'modules/better-table' : QuillBetterTable},true);
@@ -26,17 +27,23 @@ let s = new SocketsService();
 })
 
 export class EditorComponent implements OnInit {
-  @ViewChild(QuillEditorComponent, { static: true })
+  @ViewChild(QuillEditorComponent)
   editor: QuillEditorComponent;
   content = '';
   public modules: any;
   public cursor: any;
   public cursorModule: any;
   public doc: any;
+  private name: string;
+  private id: string;
 
   constructor() {
-    this.doc = s.connection.get('examples','richtext7'); //getting document with id 'richtext7' from 'examples' collection
     localStorage.setItem('roomid','richtext7'); //setting roomid same as documentid
+
+    this.name = jsondecoder(JSON.parse(localStorage.getItem('currentUser')).token).user.name;
+    this.id = jsondecoder(JSON.parse(localStorage.getItem('currentUser')).token).user.id;
+    this.doc = s.connection.get('examples','richtext7'); //getting document with id 'richtext7' from 'examples' collection
+
     this.modules = {
       blotFormatter:{},
       magicUrl: true,
@@ -100,18 +107,18 @@ export class EditorComponent implements OnInit {
         return;
       }
     });
-   
-    let token = JSON.parse(localStorage.getItem('currentUser')).token;
-    let {name,id} = jsondecoder(token).user; //name
-    this.cursor = new Cursor(id,name);
+
+    this.cursor = new Cursor(this.id,this.name);
     this.cursor.updateCursor(null);
     this.cursorModule =  this.editor.quillEditor.getModule('cursors'); 
     
     s.socket2.addEventListener('message',data=>{
       let d = JSON.parse(data.data);
       if(d.text && d.comment)
-          this.formatComment(d.name,d.comment, d.range);
-      else if(d.id ! = id && d.name!= name)
+          this.addComment(d.comment_id, d.datetime, d.id, d.name,d.comment, d.range); //Adding comment
+      else if(d.message === "delete")
+          this.removeComment(d.id);
+      else if(d.id ! = this.id && d.name!= this.name)
       {  
         if(sessionStorage.getItem(d.id)){
           this.cursorModule.moveCursor(d.id,d.range); //if cursor already exists just update range
@@ -123,7 +130,7 @@ export class EditorComponent implements OnInit {
     })
 
 
-    var customButton = document.querySelector('.ql-Comment');
+    var customButton = document.querySelector('.ql-Comment'); //comment event handler
     customButton.addEventListener('click',()=>{
       var range = this.editor.quillEditor.getSelection();
       if(!range || range.length==0)
@@ -134,7 +141,6 @@ export class EditorComponent implements OnInit {
           if (prompt == null || prompt == "") {
             alert("User cancelled the prompt.");  
           } else {
-              //range = this.editor.quillEditor.getSelection();
               var text = this.editor.quillEditor.getText(range.index, range.length);
               this.editor.quillEditor.formatText(range.index, range.length, {
                 background: "#fff72b"
@@ -142,7 +148,7 @@ export class EditorComponent implements OnInit {
               this.editor.quillEditor.formatText(0,0, {
                 background: "#ffffff"
               });
-              let comment = new Comment(id, name, prompt, range, text);
+              let comment = new Comment(this.id, this.name, prompt, range, text);
               comment.sendComment();
           }
       }
@@ -155,7 +161,7 @@ export class EditorComponent implements OnInit {
             if (source === 'quill') return;
             $event.updateContents(op);
       });
-    });
+    } );
   }
   
   logChanged($event)
@@ -163,42 +169,59 @@ export class EditorComponent implements OnInit {
       if ($event.source !== 'user') return;  
       this.doc.submitOp($event.delta, {source: 'quill'});
   }
+
   selectionUpdate($event)
   {
     this.cursor.updateCursor(this.editor.quillEditor.getSelection());
   }
-  formatComment(name,comment,range){
-    let d = new Date();
-    let s  = d.toString();
-    s = s.substring(0,s.indexOf('G'));
 
-    this.editor.quillEditor.formatText(range.index, range.length,{
+  addComment(commentid, created_on, id, name,comment,range){
+
+    this.editor.quillEditor.formatText(range.index, range.length,{ //coloring selection
       background: "#fff72b"
     });
+    let d = moment.tz(created_on, "Asia/Kolkata").format().toString();
     let d0 = document.getElementsByClassName('comments')[0];
     let d1 = document.createElement('div');
     d1.setAttribute('class','padd');
-    let s1 = document.createElement('span');
-    s1.setAttribute('id','resolve');
-    s1.appendChild(document.createTextNode(`Resolve`));
-    let br1 = document.createElement('br');
-    let br2 = document.createElement('br');
+    d1.setAttribute('id',commentid);
+    if(this.name === name && this.id===id){ //Only person who types the comment has resolve option
+      var s1 = document.createElement('span');
+      s1.setAttribute('class','resolve');
+      s1.appendChild(document.createTextNode(`Resolve`));
+      d1.appendChild(s1);
+    }   
+
     let ul = document.createElement('ul');
     let l1 = document.createElement('li');
-    l1.appendChild(document.createTextNode(`Name : ${name}`));
+    l1.appendChild(document.createTextNode(`${name}`));
     let l2 = document.createElement('li');
-    l2.appendChild(document.createTextNode(`Time : ${s}`));
+    l2.appendChild(document.createTextNode(`${d.substring(0,d.indexOf('T'))}`)); //show date
     let l3 = document.createElement('li');
-    l3.appendChild(document.createTextNode(`Comment : ${comment}`));
+    l3.appendChild(document.createTextNode(`${d.substring(d.indexOf('T')+1, d.indexOf('+'))}`)); //show time
+    let l4 = document.createElement('li');
+    l4.appendChild(document.createTextNode(`${comment}`));
     ul.appendChild(l1);
     ul.appendChild(l2);
     ul.appendChild(l3);
-    d1.appendChild(s1);
-    d1.appendChild(br1);
-    d1.appendChild(br2);
+    ul.appendChild(document.createElement('br'));
+    ul.appendChild(l4); 
     d1.appendChild(ul);
     d0.appendChild(d1);
+
+    if(this.name === name && this.id===id){ //Only person who types the comment has resolve option
+      s1.addEventListener('click',()=>{
+        s1.parentNode.parentNode.removeChild(d1);
+        console.log();
+      })
+    }  
   }
+
+  removeComment(id){
+    let d0 = document.getElementsByClassName('comments')[0];
+    d0.removeChild(document.getElementById(id));
+  }
+
   ngOnInit() {
   }
 
@@ -237,6 +260,10 @@ class Comment extends Cursor{
     let [name, id, color, range, roomid, comment, text] = [this.name, this.id, this.color, this.range, this.roomid, this.comment, this.text];
     let data = JSON.stringify({name, id, color, range, roomid, comment, text});
     s.socket2.send(data);
+  }
+  deleteComment(commentid){
+    let message = "delete";
+    s.socket2.send(JSON.stringify({commentid, message}))
   }
 }
 
