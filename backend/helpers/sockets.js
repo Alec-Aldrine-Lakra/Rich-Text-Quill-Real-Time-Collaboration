@@ -42,12 +42,16 @@ wssc.on('connection', function(ws2, req) {
                 d.datetime = res.created_on;
             }
             catch(e){
-                console.log(`Error ${e}`);
+                console.warn(`Error ${e}`);
             }   
         }
-        else if(d.message==="delete"){
-            let m = await Comment.findByIdAndRemove(d.id);
-            console.log(m);
+        else if(d.message){
+            try{
+                await Comment.updateOne({_id:d.commentid},{$set:{resolved : 'true'}});
+            }
+            catch(e){
+                console.warn('Error ',e)
+            }
         }
     
         wssc.clients.forEach(function each(client) {

@@ -4,11 +4,10 @@ import {QuillModule} from "ngx-quill";
 import { AppComponent } from "./app.component";
 import { EditorComponent } from './editor/editor.component';
 import { AppRoutingModule } from './app-routing.module';
-import {SocketsService} from './sockets.service';
 @NgModule({
   declarations: [AppComponent, EditorComponent],
   imports: [BrowserModule, AppRoutingModule, QuillModule.forRoot()],//, MentionModule],
-  providers: [SocketsService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule  { }
